@@ -185,9 +185,7 @@ const arcana = [
 ['심판','JUDGEMENT','지나온 선택을 돌아보고 새로운 결심을 해요.','경험을 바탕으로 다음 단계에 응답해 보세요.','♢'],
 ['세계','THE WORLD','하나의 여정을 마무리하고 성취를 바라보세요.','완성은 또 다른 가능성의 출발점입니다.','◎']
 ];
-const zodiac = [
-['염소자리',120,119],['물병자리',219,218],['물고기자리',320,319],['양자리',420,419],['황소자리',521,520],['쌍둥이자리',621,620],['게자리',722,721],['사자자리',823,822],['처녀자리',923,922],['천칭자리',1023,1022],['전갈자리',1122,1121],['사수자리',1222,1221]
-];
+const zodiac = [['염소자리',1222,119],['물병자리',120,218],['물고기자리',219,320],['양자리',321,420],['황소자리',421,521],['쌍둥이자리',522,621],['게자리',622,722],['사자자리',723,823],['처녀자리',824,923],['천칭자리',924,1023],['전갈자리',1024,1122],['사수자리',1123,1221]];
 const majorCopy = {
   인문:'인문학적 시선으로 의미를 발견하는 힘을 믿어 보세요.',
   사회:'사람과 세상을 읽는 감각이 좋은 방향을 찾게 해요.',
@@ -200,7 +198,7 @@ const state={name:'',birth:'',major:'',topic:'',card:null,zodiac:''};
 const $=id=>document.getElementById(id);
 function show(screen){document.querySelectorAll('.screen').forEach(el=>el.classList.toggle('active',el.id==='screen-'+screen));$('step-label').textContent=screen==='start'?'A MOMENT FOR YOU':screen==='form'?'YOUR DETAILS':'YOUR READING';window.scrollTo({top:0,behavior:'smooth'});}
 function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2400);}
-function getZodiac(date){const d=new Date(date+'T12:00:00');const m=d.getMonth()+1,day=d.getDate();const key=m*100+day;return zodiac.find(([n,end,start])=>{if(n==='염소자리')return key>=1222||key<=119;return key>=start&&key<=end})?.[0]||'별자리';}
+function getZodiac(date){const d=new Date(date+'T12:00:00');const key=(d.getMonth()+1)*100+d.getDate();return zodiac.find(([name,start,end])=>name==='염소자리'?(key>=start||key<=end):(key>=start&&key<=end))?.[0]||'별자리';}
 function getMajorGroup(text){if(!text)return '';if(/경영|경제|무역|회계|마케팅|금융|행정|정치|사회|심리|법|언론/.test(text))return /경영|경제|무역|회계|마케팅|금융/.test(text)?'경영':'사회';if(/공학|컴퓨터|소프트웨어|기계|전자|산업|건축|정보통신/.test(text))return '공학';if(/수학|물리|화학|생명|자연|통계|과학/.test(text))return '자연';if(/미술|음악|체육|디자인|예술|연극|무용/.test(text))return '예체능';if(/문학|국어|영어|역사|철학|어문/.test(text))return '인문';return '';}
 function makeReading(card){const topicLine=topicCopy[state.topic][card[0].charCodeAt(0)%2];const major=getMajorGroup(state.major);const personal=major?majorCopy[major]:'오늘의 작은 선택을 당신다운 방식으로 이어가 보세요.';const zodiacLine=state.zodiac+'의 감각을 믿되, 당신만의 속도로 움직여요.';const first=state.name+'님, '+card[2];const second=state.zodiac+'의 '+(state.zodiac==='사자자리'?'자신감':state.zodiac==='처녀자리'?'섬세함':state.zodiac==='물고기자리'?'공감력':'감각')+'을 오늘의 힌트로 삼아 보세요.';const third=major?personal:topicLine;return [first,second,third].slice(0,3);}
 function symbolSvg(symbol,index){const gold='#E7C987';const violet='#B7A8FF';const paths=[
