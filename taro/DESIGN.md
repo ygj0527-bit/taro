@@ -7,7 +7,7 @@
 - **제품:** 오늘의 타로 — 설치·회원가입 없이 1분 안에 한 장의 타로와 개인화된 짧은 해석을 확인하고 저장·공유하는 모바일 웹서비스
 - **테마:** Dark-first
 - **디자인 키워드:** 신비로움, 차분함, 몰입, 따뜻한 안내, 신뢰
-- **기준 화면:** 모바일 393 × 852px
+- **기준 화면:** 모바일 375 × 844px
 - **기술 스타일 기준:** Tailwind CSS v4 유틸리티·CSS 변수 방식, shadcn/ui의 의미 기반 토큰 및 접근성 패턴을 참고한다.
 
 ---
@@ -579,3 +579,36 @@ Tailwind v4의 `@theme`와 CSS custom properties를 사용한다. 색상은 의�
 - `TARO_04_와이어프레임.md`: S-01 시작, S-02 입력, S-03 결과 화면 구조와 문구.
 
 기획 문서와 이 디자인 가이드가 충돌하면 개인정보 보호·기능 완료 조건은 PRD와 기능명세서를 우선하고, 시각적 표현은 이 문서를 따른다. 이 문서는 MVP 범위를 확장하지 않으며, 역방향 카드·다중 스프레드·로그인·결과 이력 기능을 추가하지 않는다.
+
+
+---
+
+## 11. 375px 화면 구현 기준
+
+기획서의 S-01~S-03 와이어프레임을 기준으로 실제 화면을 구성할 때 다음 값을 우선한다.
+
+- **기준 뷰포트:** 375 × 844px, 세로형 모바일
+- **콘텐츠 폭:** 335px (좌우 20px)
+- **안전 영역:** 상단·하단 safe-area inset 반영
+- **스크롤:** 입력 화면은 콘텐츠 길이에 따라 세로 스크롤 허용, 결과 화면은 카드와 액션을 한 흐름으로 배치
+- **화면 전환:** S-01 시작 → S-02 입력 → S-03 결과. 결과의 다시 뽑기는 S-02로 돌아가 기존 입력값을 유지하고, 처음으로는 모든 입력값과 선택 상태를 지운다.
+- **카드 공개:** 결과 화면 전환 시 1초 이내의 Y축 플립 리빌 애니메이션을 적용한다. 모션 감소 설정에서는 애니메이션을 최소화한다.
+- **결과 이미지:** 1080 × 1350px (4:5), 카드명·번호·이름·주제·별자리·해석·오락용 안내·서비스명을 포함한다. 생년월일과 전공 원문은 포함하지 않는다.
+- **개인정보:** 이름·생년월일·전공은 화면 메모리에서만 사용한다. 서버 전송, localStorage, sessionStorage, 쿠키, 분석 도구 사용을 금지한다.
+
+### 화면 컴포넌트 인벤토리
+
+| Component | Variant / behavior | Figma component |
+|---|---|---|
+| Primary Button | Violet filled, full-width, 54px | Button / Primary |
+| Ghost Button | Frost outline, pill | Button / Ghost |
+| Input Field | Label + raised input surface | Form / Input Field |
+| Topic Chip | Default / selected, six topics | Topic / Chip |
+| Privacy Notice | Frosted violet panel with privacy copy | Notice / Privacy |
+| Tarot Card Back | Gold frame + editable vector ornament | Tarot / Card Back |
+| Tarot Result Card | Card number, title, zodiac and 3-line reading | Tarot / Result Card |
+
+### 구현 파일
+
+- `taro/index.html`: 프레임워크 설치 없이 실행할 수 있는 모바일 우선 단일 HTML 앱. CSS 변수와 shadcn/ui 의미 토큰 매핑을 사용하며, 기능은 브라우저 안에서만 동작한다.
+- 화면과 결과 이미지의 색상·타이포그래피·간격은 이 문서의 토큰을 단일 기준으로 사용한다.
