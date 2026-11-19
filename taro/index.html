@@ -53,6 +53,7 @@ h1,h2,p{margin:0}h1{font-size:29px;line-height:1.32;letter-spacing:-.055em;font-
 .result-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0 10px}.result-actions .btn{min-height:46px;padding:0 10px;font-size:12px}.result-actions .btn-primary{grid-column:span 2}
 .secondary-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.secondary-actions .btn{min-height:43px;font-size:12px;padding:0 10px}
 .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,18px);opacity:0;pointer-events:none;padding:11px 16px;border-radius:999px;background:#292541;border:1px solid rgba(216,208,255,.2);color:#fff;font-size:12px;box-shadow:0 12px 32px rgba(0,0,0,.35);transition:.25s;z-index:5;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}
+.fallback{position:fixed;inset:0;z-index:10;background:rgba(3,4,13,.82);backdrop-filter:blur(12px);display:grid;place-items:center;padding:20px}.fallback[hidden]{display:none}.fallback-sheet{position:relative;width:min(100%,390px);max-height:88svh;overflow:auto;padding:22px;border:1px solid var(--border);border-radius:18px;background:#171B35;box-shadow:0 24px 70px rgba(0,0,0,.55)}.fallback-close{position:absolute;right:14px;top:10px;border:0;background:transparent;color:var(--body);font-size:26px}.fallback-sheet p{padding-right:28px;margin-bottom:14px;color:var(--foreground);font-size:13px}.fallback-sheet img{display:block;width:100%;height:auto;border-radius:10px}.fallback-sheet textarea{width:100%;min-height:180px;resize:vertical;padding:12px;border:1px solid var(--border);border-radius:10px;background:#0E1228;color:var(--foreground);font:13px/1.7 'IBM Plex Sans KR',sans-serif}
 .result-art.reveal{animation:cardReveal .72s cubic-bezier(.2,.72,.25,1) both;transform-style:preserve-3d}@keyframes cardReveal{0%{opacity:.35;transform:perspective(900px) rotateY(88deg) scale(.94)}55%{opacity:1;transform:perspective(900px) rotateY(-8deg) scale(1.015)}100%{transform:perspective(900px) rotateY(0) scale(1)}}
 @media(min-width:600px){body{padding:28px 0}.app{min-height:844px;border:1px solid rgba(210,216,255,.1);border-radius:28px;overflow:hidden;box-shadow:0 25px 90px rgba(0,0,0,.35)}}
 @media(max-height:760px){.card-stage{min-height:300px}.tarot-back{width:178px;height:270px}.back-inner svg{height:180px}.result-art-inner{min-height:385px}.result-symbol{height:140px}}
@@ -151,6 +152,14 @@ h1,h2,p{margin:0}h1{font-size:29px;line-height:1.32;letter-spacing:-.055em;font-
   </section>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="fallback" id="fallback" hidden>
+  <div class="fallback-sheet" role="dialog" aria-modal="true" aria-labelledby="fallback-note">
+    <button class="fallback-close" id="fallback-close" type="button" aria-label="닫기">×</button>
+    <p id="fallback-note"></p>
+    <img id="fallback-image" alt="저장할 타로 결과 이미지" hidden>
+    <textarea id="fallback-text" readonly hidden aria-label="복사할 타로 결과 글"></textarea>
+  </div>
+</div>
 <script>
 const topics = ['커리어','재물','연애','건강','학업','종합'];
 const topicCopy = {
@@ -198,6 +207,8 @@ const state={name:'',birth:'',major:'',topic:'',card:null,zodiac:''};
 const $=id=>document.getElementById(id);
 function show(screen){document.querySelectorAll('.screen').forEach(el=>el.classList.toggle('active',el.id==='screen-'+screen));$('step-label').textContent=screen==='start'?'A MOMENT FOR YOU':screen==='form'?'YOUR DETAILS':'YOUR READING';window.scrollTo({top:0,behavior:'smooth'});}
 function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2400);}
+function openFallback(message,{imageUrl=null,text=null}={}){$('fallback-note').textContent=message;const img=$('fallback-image');img.hidden=!imageUrl;img.src=imageUrl||'';const area=$('fallback-text');area.hidden=!text;area.value=text||'';$('fallback').hidden=false;}
+function closeFallback(){const src=$('fallback-image').src;if(src&&src.startsWith('blob:'))URL.revokeObjectURL(src);$('fallback-image').src='';$('fallback').hidden=true;}
 function getZodiac(date){const d=new Date(date+'T12:00:00');const key=(d.getMonth()+1)*100+d.getDate();return zodiac.find(([name,start,end])=>name==='염소자리'?(key>=start||key<=end):(key>=start&&key<=end))?.[0]||'별자리';}
 function getMajorGroup(text){if(!text)return '';if(/경영|경제|무역|회계|마케팅|금융|행정|정치|사회|심리|법|언론/.test(text))return /경영|경제|무역|회계|마케팅|금융/.test(text)?'경영':'사회';if(/공학|컴퓨터|소프트웨어|기계|전자|산업|건축|정보통신/.test(text))return '공학';if(/수학|물리|화학|생명|자연|통계|과학/.test(text))return '자연';if(/미술|음악|체육|디자인|예술|연극|무용/.test(text))return '예체능';if(/문학|국어|영어|역사|철학|어문/.test(text))return '인문';return '';}
 function makeReading(card){const topicLine=topicCopy[state.topic][card[0].charCodeAt(0)%2];const major=getMajorGroup(state.major);const personal=major?majorCopy[major]:'오늘의 작은 선택을 당신다운 방식으로 이어가 보세요.';const zodiacLine=state.zodiac+'의 감각을 믿되, 당신만의 속도로 움직여요.';const first=state.name+'님, '+card[2];const second=state.zodiac+'의 '+(state.zodiac==='사자자리'?'자신감':state.zodiac==='처녀자리'?'섬세함':state.zodiac==='물고기자리'?'공감력':'감각')+'을 오늘의 힌트로 삼아 보세요.';const third=major?personal:topicLine;return [first,second,third].slice(0,3);}
@@ -217,13 +228,13 @@ $('topic-grid').addEventListener('click',e=>{const b=e.target.closest('[data-top
 function validate(){const name=$('name').value.trim();const birth=$('birth').value;const validBirth=birth&&new Date(birth+'T00:00:00')<=new Date()&&/^\d{4}-\d{2}-\d{2}$/.test(birth);$('draw-btn').disabled=!(name&&validBirth&&state.topic);}
 ['name','birth'].forEach(id=>$(id).addEventListener('input',validate));
 $('tarot-form').addEventListener('submit',e=>{e.preventDefault();validate();if($('draw-btn').disabled){if(!$('name').value.trim())$('name').focus();else if(!$('birth').value)$('birth').focus();else toast('생년월일을 다시 확인해 주세요');return;}state.name=$('name').value.trim();state.birth=$('birth').value;state.major=$('major').value.trim();state.zodiac=getZodiac(state.birth);$('draw-btn').disabled=true;$('draw-btn').textContent='카드를 펼치는 중…';setTimeout(()=>{drawCard();$('draw-btn').innerHTML='카드 한 장 뽑기 <span aria-hidden="true">✧</span>';validate();},650);});
-$('save-btn').addEventListener('click',async()=>{try{const blob=await makePng();const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='오늘의-타로-'+state.card[0]+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('이미지를 저장했어요');}catch(e){toast('이미지를 길게 눌러 저장해 주세요');}});
-$('share-btn').addEventListener('click',async()=>{try{const blob=await makePng();const file=new File([blob],'tarot-reading.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:shareText(),title:'오늘의 타로'});return;}if(navigator.share){await navigator.share({text:shareText(),title:'오늘의 타로'});return;}await copyText(shareText());toast('결과를 복사했어요. 원하는 앱에 붙여 넣어 주세요');}catch(e){if(e.name!=='AbortError'){try{await copyText(shareText());toast('결과를 복사했어요. 원하는 앱에 붙여 넣어 주세요');}catch{toast('아래 글을 길게 눌러 복사해 주세요');}}}});
+$('save-btn').addEventListener('click',async()=>{try{const blob=await makePng();if(!('download' in HTMLAnchorElement.prototype)){openFallback('이미지를 길게 눌러 저장해 주세요',{imageUrl:URL.createObjectURL(blob)});return;}const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='오늘의-타로-'+state.card[0]+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('이미지를 저장했어요');}catch(e){const blob=await makePng();openFallback('이미지를 길게 눌러 저장해 주세요',{imageUrl:URL.createObjectURL(blob)});}});
+$('share-btn').addEventListener('click',async()=>{try{const blob=await makePng();const file=new File([blob],'tarot-reading.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:shareText(),title:'오늘의 타로'});return;}if(navigator.share){await navigator.share({text:shareText(),title:'오늘의 타로'});return;}await copyText(shareText());toast('결과를 복사했어요. 원하는 앱에 붙여 넣어 주세요');}catch(e){if(e.name!=='AbortError'){try{await copyText(shareText());toast('결과를 복사했어요. 원하는 앱에 붙여 넣어 주세요');}catch{openFallback('아래 글을 길게 눌러 복사해 주세요',{text:shareText()});}}}});
 async function copyText(text){if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return;}const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();if(!ok)throw new Error('copy failed');}
 $('copy-btn').addEventListener('click',async()=>{try{await copyText(shareText());toast('결과를 복사했어요. 원하는 앱에 붙여 넣어 주세요');}catch{toast('아래 글을 길게 눌러 복사해 주세요');}});
 $('retry-btn').addEventListener('click',()=>{show('form');});
 function clearState(){state.name='';state.birth='';state.major='';state.topic='';state.card=null;state.zodiac='';$('tarot-form').reset();document.querySelectorAll('.topic').forEach(x=>x.setAttribute('aria-pressed','false'));$('draw-btn').disabled=true;show('start');}
-$('reset-btn').addEventListener('click',clearState);
+$('reset-btn').addEventListener('click',clearState);$('fallback-close').addEventListener('click',closeFallback);$('fallback').addEventListener('click',e=>{if(e.target===$('fallback'))closeFallback();});
 window.addEventListener('pagehide',()=>{state.name='';state.birth='';state.major='';state.topic='';state.card=null;});
 </script>
 </body>
