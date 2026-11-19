@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080A18">
+<meta name="description" content="오늘, 나를 비추는 한 장의 타로. 가입 없이 가볍게 즐기는 개인화 타로 리딩.">
+<title>오늘의 타로 — Midnight Tarot</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap');
+:root{color-scheme:dark;--background:#080A18;--foreground:#F4F0FF;--card:#171B35;--card-2:#202544;--primary:#8B72E8;--primary-soft:#B7A8FF;--gold:#D8B978;--gold-soft:#F0DCA8;--muted:#9296B0;--body:#C4C5D8;--border:rgba(210,216,255,.14);--glass:rgba(185,190,255,.07);--radius:16px;--shadow:0 18px 50px rgba(0,0,0,.42),0 0 28px rgba(139,114,232,.12);font-family:'IBM Plex Sans KR',system-ui,sans-serif}
+*{box-sizing:border-box}html{min-height:100%;background:var(--background)}body{margin:0;min-height:100svh;color:var(--foreground);background:radial-gradient(ellipse at 50% -5%,rgba(139,114,232,.22),transparent 42%),radial-gradient(ellipse at 100% 55%,rgba(67,83,145,.09),transparent 40%),var(--background);font-size:15px;line-height:1.55;letter-spacing:-.02em}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.25;background-image:linear-gradient(rgba(186,215,247,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(186,215,247,.035) 1px,transparent 1px);background-size:72px 72px;mask-image:linear-gradient(to bottom,black,transparent 90%)}
+button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid var(--primary-soft);outline-offset:3px}
+.app{width:min(100%,435px);min-height:100svh;margin:0 auto;position:relative;padding:env(safe-area-inset-top) 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
+.topbar{height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;letter-spacing:.02em}.brand-mark{width:30px;height:30px;border:1px solid rgba(216,185,120,.42);border-radius:50%;display:grid;place-items:center;color:var(--gold);font-size:16px;box-shadow:inset 0 0 16px rgba(139,114,232,.18)}
+.step{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.screen{display:none;flex:1;flex-direction:column;animation:appear .45s ease both}.screen.active{display:flex}
+@keyframes appear{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.eyebrow{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--primary-soft);font-size:10px;letter-spacing:.22em;font-weight:600}.eyebrow:before,.eyebrow:after{content:"";height:1px;width:32px;background:linear-gradient(90deg,transparent,rgba(183,168,255,.5))}.eyebrow:after{transform:rotate(180deg)}
+h1,h2,p{margin:0}h1{font-size:29px;line-height:1.32;letter-spacing:-.055em;font-weight:600}h2{font-size:22px;line-height:1.35;letter-spacing:-.04em}.serif{font-family:'Cormorant Garamond',serif;letter-spacing:.025em}
+.muted{color:var(--muted)}.body-copy{color:var(--body);font-size:14px;line-height:1.7}
+.start-hero{padding-top:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}.start-hero h1{font-size:30px}.start-hero h1 em{font-style:normal;color:var(--gold-soft)}
+.card-stage{position:relative;display:grid;place-items:center;flex:1;min-height:360px;padding:22px 0}
+.card-stage:before{content:"";position:absolute;width:270px;height:270px;border-radius:50%;background:rgba(139,114,232,.13);filter:blur(48px)}
+.tarot-back{width:208px;height:314px;position:relative;border-radius:15px;padding:9px;background:linear-gradient(145deg,#e3c98e,#8b72e8 42%,#4e477d 72%,#d8b978);box-shadow:0 25px 60px rgba(0,0,0,.5),0 0 36px rgba(139,114,232,.18);transform:rotate(-3deg);animation:float 5s ease-in-out infinite}
+.tarot-back:before{content:"";position:absolute;inset:5px;border:1px solid rgba(255,232,177,.7);border-radius:11px}
+.tarot-back:after{content:"";position:absolute;inset:14px;border:1px solid rgba(240,220,168,.38);border-radius:8px}
+.back-inner{height:100%;border:1px solid rgba(255,255,255,.22);border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:radial-gradient(circle at 50% 42%,rgba(183,168,255,.3),transparent 45%),linear-gradient(145deg,#252448,#11152d 60%,#30264b);overflow:hidden}
+.back-inner svg{width:146px;height:208px;z-index:1}.back-word{font-size:9px;letter-spacing:.3em;color:var(--gold-soft);z-index:1}
+.float-orb{position:absolute;color:var(--gold);opacity:.7}.orb-a{top:12%;left:7%;font-size:18px}.orb-b{right:5%;top:26%;font-size:13px}.orb-c{bottom:12%;left:12%;font-size:11px}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(-1deg)}}
+.actions{display:flex;flex-direction:column;gap:12px;margin-top:auto}
+.btn{min-height:54px;border:1px solid var(--border);border-radius:999px;padding:0 22px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:600;transition:transform .18s,filter .18s,background .18s}
+.btn:active{transform:scale(.985)}.btn-primary{color:#fff;background:linear-gradient(110deg,#9278ed,#7558d4);border-color:rgba(219,209,255,.25);box-shadow:0 8px 28px rgba(103,76,196,.26),inset 0 1px 0 rgba(255,255,255,.22)}
+.btn-ghost{color:var(--body);background:rgba(185,190,255,.045)}.btn:disabled{opacity:.38;cursor:not-allowed;filter:saturate(.5)}
+.privacy-note{display:flex;align-items:flex-start;justify-content:center;gap:7px;color:var(--muted);font-size:11px;text-align:center;line-height:1.55}.privacy-note svg{flex-shrink:0;margin-top:1px}
+.form-head{padding:22px 0 20px}.form-head .eyebrow{justify-content:flex-start;margin-bottom:12px}.form-head .eyebrow:before{display:none}.form-head h1{font-size:26px}.form-head p{margin-top:7px;color:var(--muted);font-size:13px}
+.field{margin-bottom:15px}.field label{display:block;font-size:13px;font-weight:600;color:#e5e1f4;margin-bottom:7px}.optional{font-size:11px;color:var(--muted);font-weight:400;margin-left:5px}
+.input{width:100%;height:49px;border:1px solid var(--border);border-radius:10px;background:rgba(199,203,235,.055);color:#fff;padding:0 14px;font-size:15px;transition:border .2s,box-shadow .2s}.input::placeholder{color:#8589a3}.input:focus{border-color:rgba(183,168,255,.65);box-shadow:0 0 0 3px rgba(139,114,232,.12);outline:0}
+.topic-title{font-size:14px;font-weight:600;margin:8px 0 10px}.topic-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.topic{min-height:46px;border:1px solid var(--border);border-radius:999px;background:rgba(185,190,255,.045);color:var(--body);font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px}.topic[aria-pressed=true]{color:#fff;background:rgba(139,114,232,.2);border-color:rgba(183,168,255,.72);box-shadow:inset 0 0 16px rgba(139,114,232,.13)}.topic .emoji{font-size:15px}
+.privacy-box{margin:17px 0 16px;padding:13px 14px;border:1px solid rgba(183,168,255,.16);border-radius:12px;background:rgba(139,114,232,.07);display:flex;gap:10px;color:var(--body);font-size:11px;line-height:1.65}.privacy-box strong{color:#e5ddff;font-weight:600}
+.form-actions{margin-top:auto;padding-top:10px}
+.result-head{text-align:center;padding:16px 0 12px}.result-head .eyebrow{margin-bottom:8px}.result-head p{font-size:12px;color:var(--muted);margin-top:4px}
+.result-art{width:min(100%,310px);margin:0 auto;position:relative;border-radius:18px;padding:8px;background:linear-gradient(145deg,#e7d19c,#8b72e8 48%,#554b7f 75%,#d8b978);box-shadow:var(--shadow)}
+.result-art-inner{border:1px solid rgba(255,232,177,.58);border-radius:12px;padding:15px 16px 14px;background:radial-gradient(ellipse at 50% 35%,rgba(139,114,232,.18),transparent 58%),linear-gradient(180deg,#1c1c3b,#0e1429);text-align:center;min-height:415px;display:flex;flex-direction:column;align-items:center}
+.result-kicker{font-size:10px;letter-spacing:.12em;color:var(--gold-soft);font-weight:600}.result-symbol{width:150px;height:164px;margin:8px auto 4px;display:grid;place-items:center}.result-symbol svg{width:100%;height:100%;overflow:visible}
+.arcana-number{font-family:'Cormorant Garamond',serif;color:var(--gold-soft);font-size:13px;letter-spacing:.22em}.arcana-name{font-size:25px;font-weight:600;margin:1px 0 0}.arcana-sub{font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase}
+.result-divider{height:1px;width:100%;margin:10px 0;background:linear-gradient(90deg,transparent,rgba(216,185,120,.55),transparent)}
+.reading{width:100%;display:flex;flex-direction:column;gap:5px;text-align:left;font-size:12px;line-height:1.65;color:#e6e2f2}.reading p:before{content:"✦";color:var(--gold);margin-right:7px;font-size:9px}
+.fun-label{margin-top:auto;padding-top:9px;color:#aaa6c2;font-size:9px;letter-spacing:.02em}
+.result-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0 10px}.result-actions .btn{min-height:46px;padding:0 10px;font-size:12px}.result-actions .btn-primary{grid-column:span 2}
+.secondary-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.secondary-actions .btn{min-height:43px;font-size:12px;padding:0 10px}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,18px);opacity:0;pointer-events:none;padding:11px 16px;border-radius:999px;background:#292541;border:1px solid rgba(216,208,255,.2);color:#fff;font-size:12px;box-shadow:0 12px 32px rgba(0,0,0,.35);transition:.25s;z-index:5;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(min-width:600px){body{padding:28px 0}.app{min-height:844px;border:1px solid rgba(210,216,255,.1);border-radius:28px;overflow:hidden;box-shadow:0 25px 90px rgba(0,0,0,.35)}}
+@media(max-height:760px){.card-stage{min-height:300px}.tarot-back{width:178px;height:270px}.back-inner svg{height:180px}.result-art-inner{min-height:385px}.result-symbol{height:140px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">✧</span><span>오늘의 타로</span></div>
+    <span class="step" id="step-label">A MOMENT FOR YOU</span>
+  </header>
+
+  <section class="screen active" id="screen-start" aria-labelledby="start-title">
+    <div class="start-hero">
+      <div class="eyebrow">A LITTLE MOMENT OF MAGIC</div>
+      <h1 id="start-title">오늘, 당신을 비추는<br><em>한 장의 카드</em></h1>
+      <p class="body-copy">내 이야기를 담아, 오늘의 마음을 들여다봐요.</p>
+    </div>
+    <div class="card-stage" aria-label="타로 카드 뒷면 일러스트">
+      <span class="float-orb orb-a">✦</span><span class="float-orb orb-b">✧</span><span class="float-orb orb-c">✴</span>
+      <div class="tarot-back">
+        <div class="back-inner">
+          <svg viewBox="0 0 160 220" fill="none" aria-hidden="true">
+            <path d="M80 10 145 110 80 210 15 110 80 10Z" stroke="#D8B978" stroke-opacity=".75" stroke-width="1.2"/>
+            <path d="M80 27 129 110 80 193 31 110 80 27Z" stroke="#D8B978" stroke-opacity=".38"/>
+            <circle cx="80" cy="110" r="43" stroke="#EAD49A" stroke-width="1.2"/>
+            <circle cx="80" cy="110" r="32" stroke="#EAD49A" stroke-opacity=".45"/>
+            <path d="M80 67 86 101 120 110 86 119 80 153 74 119 40 110 74 101 80 67Z" fill="#D8B978" fill-opacity=".9"/>
+            <circle cx="80" cy="110" r="10" fill="#F0DCA8"/>
+            <path d="M80 4v14M80 202v14M8 110h14M138 110h14M29 59l10 10M121 161l10 10M131 59l-10 10M39 161l-10 10" stroke="#EAD49A" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="35" cy="32" r="2" fill="#F0DCA8"/><circle cx="126" cy="32" r="2" fill="#F0DCA8"/><circle cx="35" cy="188" r="2" fill="#F0DCA8"/><circle cx="126" cy="188" r="2" fill="#F0DCA8"/>
+          </svg>
+          <span class="back-word">THE UNIVERSE WITHIN</span>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="start-btn">타로 시작하기 <span aria-hidden="true">→</span></button>
+      <p class="privacy-note"><span aria-hidden="true">✧</span> 오락용 타로 · 입력한 정보는 저장하지 않아요</p>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-form" aria-labelledby="form-title">
+    <div class="form-head">
+      <div class="eyebrow">YOUR STORY, YOUR CARD</div>
+      <h1 id="form-title">나에 대해 알려 주세요</h1>
+      <p>당신에게 맞는 짧은 메시지를 준비할게요.</p>
+    </div>
+    <form id="tarot-form" novalidate>
+      <div class="field"><label for="name">이름 <span class="optional">닉네임도 좋아요</span></label><input class="input" id="name" name="name" maxlength="10" autocomplete="off" placeholder="예) 지민" required></div>
+      <div class="field"><label for="birth">생년월일</label><input class="input" id="birth" name="birth" type="date" autocomplete="off" required></div>
+      <div class="field"><label for="major">전공 <span class="optional">선택 사항</span></label><input class="input" id="major" name="major" maxlength="30" autocomplete="off" placeholder="예) 경영학과"></div>
+      <div class="topic-title">어떤 주제가 궁금한가요?</div>
+      <div class="topic-grid" id="topic-grid">
+        <button class="topic" type="button" data-topic="커리어" aria-pressed="false"><span class="emoji">✧</span>커리어</button>
+        <button class="topic" type="button" data-topic="재물" aria-pressed="false"><span class="emoji">◇</span>재물</button>
+        <button class="topic" type="button" data-topic="연애" aria-pressed="false"><span class="emoji">♡</span>연애</button>
+        <button class="topic" type="button" data-topic="건강" aria-pressed="false"><span class="emoji">☾</span>건강</button>
+        <button class="topic" type="button" data-topic="학업" aria-pressed="false"><span class="emoji">✎</span>학업</button>
+        <button class="topic" type="button" data-topic="종합" aria-pressed="false"><span class="emoji">✦</span>종합</button>
+      </div>
+      <div class="privacy-box"><span aria-hidden="true">♧</span><span><strong>당신의 정보는 안전해요.</strong><br>이름 · 생년월일 · 전공은 해석을 만드는 데만 쓰고 서버로 보내거나 저장하지 않아요. 창을 닫거나 처음으로 돌아가면 바로 지워져요.</span></div>
+      <div class="form-actions"><button class="btn btn-primary" id="draw-btn" type="submit" disabled>카드 한 장 뽑기 <span aria-hidden="true">✧</span></button></div>
+    </form>
+  </section>
+
+  <section class="screen" id="screen-result" aria-labelledby="result-title">
+    <div class="result-head">
+      <div class="eyebrow">YOUR PERSONAL READING</div>
+      <h2 id="result-title">오늘의 카드가 도착했어요</h2>
+      <p id="result-subtitle">당신을 위한 작은 메시지</p>
+    </div>
+    <article class="result-art" id="share-card" aria-label="타로 결과 카드">
+      <div class="result-art-inner">
+        <div class="result-kicker" id="result-owner">TODAY'S TAROT</div>
+        <div class="result-symbol" id="result-symbol"></div>
+        <div class="arcana-number" id="result-number"></div>
+        <div class="arcana-name" id="result-name"></div>
+        <div class="arcana-sub" id="result-en"></div>
+        <div class="result-divider"></div>
+        <div class="reading" id="reading"></div>
+        <div class="fun-label">※ 오락용 타로 해석입니다 · 오늘의 타로</div>
+      </div>
+    </article>
+    <div class="result-actions">
+      <button class="btn btn-primary" id="save-btn">이미지 저장 <span aria-hidden="true">↓</span></button>
+      <button class="btn btn-ghost" id="share-btn">결과 공유 ↗</button>
+      <button class="btn btn-ghost" id="copy-btn">글 복사</button>
+    </div>
+    <div class="secondary-actions">
+      <button class="btn btn-ghost" id="retry-btn">다시 뽑기</button>
+      <button class="btn btn-ghost" id="reset-btn">처음으로</button>
+    </div>
+    <p class="privacy-note" style="margin-top:14px">🔒 입력한 정보는 저장되지 않아요. 처음으로 돌아가면 바로 지워져요.</p>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const topics = ['커리어','재물','연애','건강','학업','종합'];
+const topicCopy = {
+  커리어:['새로운 가능성을 살피고, 당신의 강점을 밖으로 꺼내 보세요.','작은 시도가 다음 기회를 발견하는 열쇠가 될 수 있어요.'],
+  재물:['수입보다 지출의 흐름을 먼저 살펴보면 좋겠어요.','지금은 우선순위를 정하고 균형을 돌아볼 때예요.'],
+  연애:['마음을 솔직하고 다정하게 표현해 보세요.','상대의 속도와 나의 마음을 함께 존중해 주세요.'],
+  건강:['몸의 작은 신호에 귀 기울이고 충분히 쉬어 주세요.','무리한 결정보다 일상의 리듬을 돌보는 데 집중해요.'],
+  학업:['한 번에 많이 하기보다 오늘의 한 가지에 집중해요.','꾸준히 쌓아 온 시간이 실력으로 이어지고 있어요.'],
+  종합:['지금의 마음을 천천히 들여다보면 방향이 선명해져요.','작은 선택 하나가 새로운 흐름을 만들어 줄 거예요.']
+};
+const arcana = [
+['바보','THE FOOL','새로운 시작 앞에서 호기심을 믿어 보세요.','모든 경험이 당신만의 지도가 되어 줄 거예요.','☼'],
+['마법사','THE MAGICIAN','이미 가진 도구와 재능을 연결할 시간이에요.','생각을 작은 행동으로 옮겨 보세요.','✧'],
+['여사제','THE HIGH PRIESTESS','서두르지 말고 마음속 목소리를 들어 보세요.','아직 드러나지 않은 답이 안에 있을 수 있어요.','☾'],
+['여황제','THE EMPRESS','돌봄과 풍요의 감각을 일상에 채워 보세요.','당신이 가꾸는 것은 천천히 자라납니다.','❀'],
+['황제','THE EMPEROR','기준을 세우고 한 걸음씩 정돈해 보세요.','단단한 구조가 다음 도전을 지탱해 줄 거예요.','♜'],
+['교황','THE HIEROPHANT','배움과 조언 속에서 새로운 관점을 찾아보세요.','익숙한 원칙을 나만의 방식으로 해석해요.','✥'],
+['연인','THE LOVERS','마음이 향하는 곳과 중요한 가치를 살펴보세요.','진심을 담은 선택이 관계를 깊게 합니다.','♡'],
+['전차','THE CHARIOT','목표를 정했다면 집중해서 나아가 보세요.','속도보다 방향을 잃지 않는 것이 중요해요.','✦'],
+['힘','STRENGTH','부드러운 용기와 인내를 믿어 보세요.','차분함이 생각보다 큰 힘을 발휘합니다.','♌'],
+['은둔자','THE HERMIT','잠시 멈춰 나만의 답을 찾는 시간을 가져요.','고요한 성찰이 다음 길을 밝혀 줄 거예요.','✧'],
+['운명의 수레바퀴','WHEEL OF FORTUNE','변화의 흐름을 유연하게 받아들여 보세요.','예상 밖의 전환에서 배울 점을 발견해요.','◎'],
+['정의','JUSTICE','사실과 감정을 균형 있게 바라보세요.','정직한 판단이 마음을 가볍게 할 거예요.','⚖'],
+['매달린 사람','THE HANGED MAN','다른 각도에서 바라보면 답이 달라질 수 있어요.','잠깐의 기다림도 의미 있는 선택입니다.','⟡'],
+['죽음','DEATH','끝맺음은 새로운 공간을 만드는 과정이에요.','놓아줄 것을 정하면 다음 장이 열립니다.','☽'],
+['절제','TEMPERANCE','서로 다른 것 사이에서 나만의 균형을 찾아요.','작은 조율이 편안한 흐름을 만듭니다.','⚗'],
+['악마','THE DEVIL','나를 묶는 습관과 욕심을 알아차려 보세요.','인식하는 순간부터 선택지는 넓어집니다.','⛧'],
+['탑','THE TOWER','흔들리는 부분을 솔직하게 살펴볼 때예요.','다시 세울 때는 더 나다운 기준을 세워요.','⌂'],
+['별','THE STAR','희망을 작게라도 일상에 심어 보세요.','회복과 영감은 조용히 다시 찾아옵니다.','☆'],
+['달','THE MOON','불확실한 마음을 다그치지 말고 살펴보세요.','모든 것이 선명해질 때까지 천천히 가도 좋아요.','☾'],
+['태양','THE SUN','준비한 것을 기쁘게 드러낼 때예요.','당신다운 빛과 자신감을 나누어 보세요.','☼'],
+['심판','JUDGEMENT','지나온 선택을 돌아보고 새로운 결심을 해요.','경험을 바탕으로 다음 단계에 응답해 보세요.','♢'],
+['세계','THE WORLD','하나의 여정을 마무리하고 성취를 바라보세요.','완성은 또 다른 가능성의 출발점입니다.','◎']
+];
+const zodiac = [
+['염소자리',120,119],['물병자리',219,218],['물고기자리',320,319],['양자리',420,419],['황소자리',521,520],['쌍둥이자리',621,620],['게자리',722,721],['사자자리',823,822],['처녀자리',923,922],['천칭자리',1023,1022],['전갈자리',1122,1121],['사수자리',1222,1221]
+];
+const majorCopy = {
+  인문:'인문학적 시선으로 의미를 발견하는 힘을 믿어 보세요.',
+  사회:'사람과 세상을 읽는 감각이 좋은 방향을 찾게 해요.',
+  경영:'기획력과 균형 잡힌 판단이 당신의 강점이에요.',
+  자연:'관찰하고 탐구하는 태도가 실마리를 만들어 줘요.',
+  공학:'문제를 구조화하는 끈기가 든든한 자산이에요.',
+  예체능:'감각과 표현력이 새로운 가능성을 열어 줍니다.'
+};
+const state={name:'',birth:'',major:'',topic:'',card:null,zodiac:''};
+const $=id=>document.getElementById(id);
+function show(screen){document.querySelectorAll('.screen').forEach(el=>el.classList.toggle('active',el.id==='screen-'+screen));$('step-label').textContent=screen==='start'?'A MOMENT FOR YOU':screen==='form'?'YOUR DETAILS':'YOUR READING';window.scrollTo({top:0,behavior:'smooth'});}
+function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2400);}
+function getZodiac(date){const d=new Date(date+'T12:00:00');const m=d.getMonth()+1,day=d.getDate();const key=m*100+day;return zodiac.find(([n,end,start])=>{if(n==='염소자리')return key>=1222||key<=119;return key>=start&&key<=end})?.[0]||'별자리';}
+function getMajorGroup(text){if(!text)return '';if(/경영|경제|무역|회계|마케팅|금융|행정|정치|사회|심리|법|언론/.test(text))return /경영|경제|무역|회계|마케팅|금융/.test(text)?'경영':'사회';if(/공학|컴퓨터|소프트웨어|기계|전자|산업|건축|정보통신/.test(text))return '공학';if(/수학|물리|화학|생명|자연|통계|과학/.test(text))return '자연';if(/미술|음악|체육|디자인|예술|연극|무용/.test(text))return '예체능';if(/문학|국어|영어|역사|철학|어문/.test(text))return '인문';return '';}
+function makeReading(card){const topicLine=topicCopy[state.topic][card[0].charCodeAt(0)%2];const major=getMajorGroup(state.major);const personal=major?majorCopy[major]:'오늘의 작은 선택을 당신다운 방식으로 이어가 보세요.';const zodiacLine=state.zodiac+'의 감각을 믿되, 당신만의 속도로 움직여요.';const first=state.name+'님, '+card[2];const second=state.zodiac+'의 '+(state.zodiac==='사자자리'?'자신감':state.zodiac==='처녀자리'?'섬세함':state.zodiac==='물고기자리'?'공감력':'감각')+'을 오늘의 힌트로 삼아 보세요.';const third=major?personal:topicLine;return [first,second,third].slice(0,3);}
+function symbolSvg(symbol,index){const gold='#E7C987';const violet='#B7A8FF';const paths=[
+'<circle cx="90" cy="90" r="47" stroke="'+gold+'" stroke-width="2"/><circle cx="90" cy="90" r="35" stroke="'+gold+'" stroke-opacity=".45"/><path d="M90 27 100 78 153 90 100 102 90 153 80 102 27 90 80 78Z" fill="'+gold+'" fill-opacity=".85"/><circle cx="90" cy="90" r="12" fill="#F0DCA8"/>',
+'<path d="M90 16 108 69 164 90 108 111 90 164 72 111 16 90 72 69Z" stroke="'+gold+'" stroke-width="2"/><circle cx="90" cy="90" r="23" fill="'+violet+'" fill-opacity=".55" stroke="'+gold+'"/>',
+'<path d="M115 27a63 63 0 1 0 0 126A52 52 0 0 1 115 27Z" fill="'+gold+'" fill-opacity=".85"/><circle cx="122" cy="58" r="3" fill="'+violet+'"/><circle cx="137" cy="82" r="2" fill="'+violet+'"/>',
+'<path d="M90 22c-30 28-44 48-44 75a44 44 0 0 0 88 0c0-27-14-47-44-75Z" stroke="'+gold+'" stroke-width="2" fill="'+violet+'" fill-opacity=".25"/><path d="M90 65c-12 14-18 23-18 34a18 18 0 0 0 36 0c0-11-6-20-18-34Z" fill="'+gold+'"/>',
+'<path d="M90 18 104 72 160 90 104 108 90 162 76 108 20 90 76 72Z" stroke="'+gold+'" stroke-width="2" fill="'+violet+'" fill-opacity=".18"/><circle cx="90" cy="90" r="13" fill="'+gold+'"/>'
+];return '<svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><radialGradient id="g'+index+'"><stop stop-color="#B7A8FF" stop-opacity=".34"/><stop offset="1" stop-color="#B7A8FF" stop-opacity="0"/></radialGradient></defs><circle cx="90" cy="90" r="86" fill="url(#g'+index+')"/>'+paths[index%paths.length]+'<g fill="'+gold+'"><circle cx="25" cy="35" r="2"/><circle cx="150" cy="37" r="2"/><circle cx="28" cy="143" r="2"/><circle cx="151" cy="145" r="2"/></g><text x="90" y="177" fill="'+gold+'" font-size="7" text-anchor="middle" letter-spacing="3">'+symbol+'</text></svg>';}
+function drawCard(){state.card=arcana[Math.floor(Math.random()*arcana.length)];const readings=makeReading(state.card);$('result-owner').textContent=state.name+'님의 타로 · '+state.topic;$('result-symbol').innerHTML=symbolSvg(state.card[4],state.card[0].charCodeAt(0));$('result-number').textContent='— '+String(arcana.indexOf(state.card)).padStart(2,'0')+' —';$('result-name').textContent=state.card[0];$('result-en').textContent=state.card[1];$('reading').innerHTML=readings.map(line=>'<p></p>').join('');[...$('reading').children].forEach((p,i)=>p.append(document.createTextNode(readings[i])));$('result-subtitle').textContent=state.topic+' · '+state.zodiac;show('result');}
+function shareText(){return '🔮 '+state.name+'님의 타로 · '+state.topic+'\n'+state.card[0]+' · '+state.zodiac+'\n'+[...$('reading').querySelectorAll('p')].map(p=>p.textContent).join('\n')+'\n※ 오락용 타로 해석입니다\n나도 한 장 뽑기 → '+location.href.split('#')[0];}
+function makePng(){const readings=[...$('reading').querySelectorAll('p')].map(p=>p.textContent);const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350"><defs><radialGradient id="bg"><stop stop-color="#28234b"/><stop offset="1" stop-color="#080A18"/></radialGradient><linearGradient id="gold" x2="1" y2="1"><stop stop-color="#F0DCA8"/><stop offset=".5" stop-color="#8B72E8"/><stop offset="1" stop-color="#D8B978"/></linearGradient></defs><rect width="1080" height="1350" fill="url(#bg)"/><circle cx="540" cy="440" r="350" fill="#8B72E8" opacity=".12"/><rect x="55" y="55" width="970" height="1240" rx="42" fill="none" stroke="url(#gold)" stroke-width="5"/><rect x="78" y="78" width="924" height="1194" rx="30" fill="none" stroke="#D8B978" stroke-opacity=".42" stroke-width="2"/><text x="540" y="160" fill="#F0DCA8" font-size="34" letter-spacing="12" text-anchor="middle" font-family="sans-serif">TODAY'S TAROT</text><text x="540" y="245" fill="#F4F0FF" font-size="42" text-anchor="middle" font-family="sans-serif">'+escapeXml(state.name)+'님의 타로 · '+escapeXml(state.topic)+'</text><text x="540" y="600" fill="#E7C987" font-size="250" text-anchor="middle" font-family="serif">'+escapeXml(state.card[4])+'</text><text x="540" y="735" fill="#E7C987" font-size="36" letter-spacing="12" text-anchor="middle" font-family="serif">— '+String(arcana.indexOf(state.card)).padStart(2,'0')+' —</text><text x="540" y="820" fill="#F4F0FF" font-size="82" text-anchor="middle" font-family="sans-serif">'+escapeXml(state.card[0])+'</text><text x="540" y="875" fill="#D8B978" font-size="32" letter-spacing="10" text-anchor="middle" font-family="serif">'+state.card[1]+'</text>'+readings.map((line,i)=>'<text x="540" y="'+(1000+i*58)+'" fill="#E6E2F2" font-size="32" text-anchor="middle" font-family="sans-serif">'+escapeXml(line)+'</text>').join('')+'<text x="540" y="1205" fill="#AAA6C2" font-size="24" text-anchor="middle" font-family="sans-serif">※ 오락용 타로 해석입니다</text><text x="540" y="1248" fill="#D8B978" font-size="24" letter-spacing="5" text-anchor="middle" font-family="sans-serif">오늘의 타로</text></svg>';return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('이미지 생성 실패')),'image/png');};img.onerror=reject;img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);});}
+function escapeXml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));}
+$('start-btn').addEventListener('click',()=>show('form'));
+$('topic-grid').addEventListener('click',e=>{const b=e.target.closest('[data-topic]');if(!b)return;state.topic=b.dataset.topic;document.querySelectorAll('.topic').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));validate();});
+function validate(){const name=$('name').value.trim();const birth=$('birth').value;const validBirth=birth&&new Date(birth+'T00:00:00')<=new Date()&&/^\d{4}-\d{2}-\d{2}$/.test(birth);$('draw-btn').disabled=!(name&&validBirth&&state.topic);}
+['name','birth'].forEach(id=>$(id).addEventListener('input',validate));
+$('tarot-form').addEventListener('submit',e=>{e.preventDefault();validate();if($('draw-btn').disabled){if(!$('name').value.trim())$('name').focus();else if(!$('birth').value)$('birth').focus();else toast('생년월일을 다시 확인해 주세요');return;}state.name=$('name').value.trim();state.birth=$('birth').value;state.major=$('major').value.trim();state.zodiac=getZodiac(state.birth);$('draw-btn').disabled=true;$('draw-btn').textContent='카드를 펼치는 중…';setTimeout(()=>{drawCard();$('draw-btn').innerHTML='카드 한 장 뽑기 <span aria-hidden="true">✧</span>';validate();},650);});
+$('save-btn').addEventListener('click',async()=>{try{const blob=await makePng();const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='오늘의-타로-'+state.card[0]+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('이미지를 저장했어요');}catch(e){toast('이미지를 길게 눌러 저장해 주세요');}});
+$('share-btn').addEventListener('click',async()=>{try{const blob=await makePng();const file=new File([blob],'tarot-reading.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:shareText()});return;}if(navigator.share){await navigator.share({text:shareText()});return;}await copyText(shareText());toast('결과를 복사했어요. 원하는 앱에 붙여 넣어 주세요');}catch(e){if(e.name!=='AbortError'){try{await copyText(shareText());toast('결과를 복사했어요. 원하는 앱에 붙여 넣어 주세요');}catch{toast('아래 글을 길게 눌러 복사해 주세요');}}}});
+async function copyText(text){if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return;}const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();if(!ok)throw new Error('copy failed');}
+$('copy-btn').addEventListener('click',async()=>{try{await copyText(shareText());toast('결과를 복사했어요. 원하는 앱에 붙여 넣어 주세요');}catch{toast('아래 글을 길게 눌러 복사해 주세요');}});
+$('retry-btn').addEventListener('click',()=>{drawCard();});
+function clearState(){state.name='';state.birth='';state.major='';state.topic='';state.card=null;state.zodiac='';$('tarot-form').reset();document.querySelectorAll('.topic').forEach(x=>x.setAttribute('aria-pressed','false'));$('draw-btn').disabled=true;show('start');}
+$('reset-btn').addEventListener('click',clearState);
+window.addEventListener('pagehide',()=>{state.name='';state.birth='';state.major='';state.topic='';state.card=null;});
+</script>
+</body>
+</html>
